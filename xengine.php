@@ -2,7 +2,7 @@
 	/**
 	 * Xengine Version 2.x
 	 * @author XopherDeeP <heylisten@xtiv.net>
-	 * @version 2.0.0
+	 * @version v2.0.0-beta
 	**/
 
 	/*
@@ -22,13 +22,6 @@
 	# where class is the class name found in the Xtra's. ex: xClass.php, the method should be found there.
 	# If there is an HTML page to render with the method, the files go in the html dir, 
 
-	define('DOC_ROOT'	,$_SERVER['DOCUMENT_ROOT']);
-	define('LIBS_DIR'	,DOC_ROOT.'/x/lib'); 			# Location of the Library Files
-	define('XPHP_DIR'	,DOC_ROOT.'/x/xtra'); 			# Location of the Xtras Files
-	define('BIN'		,DOC_ROOT.'/bin'); 				# Location of the Bin Files
-
-	set_include_path(DOC_ROOT.'/x/lib');
-	
 	class Xengine
 	{
 		var $_CFG;
@@ -56,8 +49,22 @@
 
 		function __construct($cfg = false,$parent = false)
 		{
+			define('DOC_ROOT'	,$_SERVER['DOCUMENT_ROOT']);
+		
+			// Glue some configss together
+			$cfg['dir']['cfg']   = DOC_ROOT.'/'.$cfg['dir']['backdoor'].'/'. $cfg['dir']['cfg'];
+			$cfg['dir']['libs']  = $cfg['dir']['backdoor'].'/'. $cfg['dir']['libs'];
+			$cfg['dir']['Xtra']  = $cfg['dir']['backdoor'] + '/' + $cfg['dir']['Xtra'];
+			
+			define('LIBS_DIR'	,DOC_ROOT.'/'.$cfg['dir']['libs']); 			# Location of the Library Files
+			define('XPHP_DIR'	,DOC_ROOT.'/'.$cfg['dir']['Xtra']); 			# Location of the Xtras Files
+			
 
-				
+			$cfg['dir']['libs'] = LIBS_DIR;
+			// SETUP Xengine based on x.cfg
+			define('BIN'		,DOC_ROOT.'/'.$cfg['dir']['Xtra']); 				# Location of the Bin Files
+			set_include_path(LIBS_DIR);
+
 			$this->_comment("Xengine Started!");
 			ini_set('display_errors', $cfg['debug']['on']);
 
@@ -65,8 +72,11 @@
 				die("Configuration Needed");
 
 			// We need to be able to write to this directory...
-			if(!is_writeable($cfg['dir']['cfg']))
+			if(!is_writeable($cfg['dir']['cfg'])){
 				die($cfg['dir']['cfg']." Not Writable!");
+					
+			}
+
 
 			$this->_CFG   = $cfg;
 			$this->_LANG  = $cfg['lang'] ;
@@ -638,7 +648,8 @@
 			# Include the Smarty Class
 			
 			$this->lib($this->_CFG['SMARTY_V'].'/libs/Smarty.class.php');
-			$dir          = $_SERVER['DOCUMENT_ROOT'] .'/'. $this->_CFG['dir']['libs']."/".$this->_CFG['SMARTY_V'];
+
+			$dir          = LIBS_DIR."/".$this->_CFG['SMARTY_V'];
 			
 			// Be sure to clean again.
 			
@@ -668,7 +679,7 @@
 
 
 			ob_clean();
-			$this->smarty->display('index.html');
+			$this->smarty->display('index.tpl');
 			//
 			if($this->_CFG['debug']['cache']  == false){
 				$this->smarty->clearAllCache();
@@ -745,7 +756,7 @@
 		public function lib($file){
 			$this->_comment(get_class($this)." Requesting Library $file");
 			try{
-				require_once($this->_CFG['dir']['libs'].'/'.$file);
+				require_once(LIBS_DIR.'/'.$file);
 			}catch(Exception $e){
 				throw new Exception(get_class($this)." Failed to Load Library: ".$file, 1); 
 			} 
