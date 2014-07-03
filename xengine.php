@@ -1,9 +1,19 @@
 <?php
 	/**
-	 * Xengine
+	 * Xengine Version 2.x
 	 * @author XopherDeeP <heylisten@xtiv.net>
-	 * @version 1.0.0-rc1.0.1
+	 * @version 2.0.0
 	**/
+
+	/*
+	  Xengine Version 2 address the fact that Xtras and HTML files are stored in their own containing Directory.
+	  v1 split the Xtras into x/xtra and html files into html/frontdoor & html/backdoor
+	  v2 now splits the xtrans into x/_suite_/_xTra_/
+	    where xTra contains all php and html/tpl files, along with css & js files.
+
+	*/
+
+
 	# Xengine is Small and PowerFull; Hook into it using Xtras. The Xengine Idea is: Drop and Build!
 	# It setups an easy to use connection between Clean URLs and PHP Classes
 	# The eXtend PHP Classes with Xengine allowing Easy Access to the the DB using $q = $this->q(); 
@@ -17,7 +27,6 @@
 	define('XPHP_DIR'	,DOC_ROOT.'/x/xtra'); 			# Location of the Xtras Files
 	define('BIN'		,DOC_ROOT.'/bin'); 				# Location of the Bin Files
 
-	
 	set_include_path(DOC_ROOT.'/x/lib');
 	
 	class Xengine
